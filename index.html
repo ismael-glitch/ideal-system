@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitBank</title>
+    <link rel="icon" type="image/x-icon" href="images/GitBank.png">
+    <link rel="stylesheet" href="futuriste.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo">GitBank</div>
+        <nav id="nav">
+            <a href="#services">Services</a>
+            <a href="#about">À propos</a>
+        </nav>
+        <div class="header-actions">
+            <button id="btn-login-popup">Connexion</button>
+            <button id="btn-register-popup">Inscription</button>
+        </div>
+        <div class="burger" id="burger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+    <main>
+        <section id="hero">
+            <h1>Bienvenue chez GitBank</h1>
+            <p>La banque du futur, sécurisée et intelligente.</p>
+            <a href="#services" class="cta">Découvrir nos services</a>
+        </section>
+        <section id="services">
+            <h2>Nos Services</h2>
+            <div class="cards">
+                <div class="card">
+                    <h3>Épargne intelligente</h3>
+                    <p>Optimisez vos économies grâce à l’IA.</p>
+                </div>
+                <div class="card">
+                    <h3>Prêts instantanés</h3>
+                    <p>Obtenez une réponse en moins de 2 minutes.</p>
+                </div>
+                <div class="card">
+                    <h3>Investissements crypto</h3>
+                    <p>Accédez aux marchés numériques en toute sécurité.</p>
+                </div>
+                <div class="card">
+                    <h3>Gestion mobile</h3>
+                    <p>Pilotez vos comptes depuis votre smartphone.</p>
+                </div>
+            </div>
+        </section>
+        <section id="about">
+            <h2>À propos de GitBank</h2>
+            <p>GitBank révolutionne la finance avec des technologies avancées, une sécurité renforcée et une expérience utilisateur unique.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2025 GitBank. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Modale Connexion -->
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="close-login">&times;</span>
+        <h2>Connexion</h2>
+        <form id="form-login">
+            <label for="login-email">Email :</label>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <label for="login-password">Mot de passe :</label>
+            <input type="password" id="login-password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+            <div id="login-error"></div>
+        </form>
+    </div>
+</div>
+
+<!-- Modale Inscription -->
+<div id="register-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="close-register">&times;</span>
+        <h2>Inscription</h2>
+        <form id="form-register">
+            <label for="fullname">Nom complet :</label>
+            <input type="text" id="fullname" placeholder="Nom complet" required>
+            <label for="register-email">Email :</label>
+            <input type="email" id="register-email" placeholder="Email" required>
+            <label for="register-password">Mot de passe :</label>
+            <input type="password" id="register-password" placeholder="Mot de passe" required>
+            <label for="birthdate">Date de naissance :</label>
+            <input type="date" id="birthdate" required>
+            <label for="id-front">Carte d'identité recto :</label>
+            <input type="file" id="id-front" accept="image/*" required>
+            <label for="id-back">Carte d'identité verso :</label>
+            <input type="file" id="id-back" accept="image/*" required>
+            <button type="submit">S'inscrire</button>
+            <div id="register-error"></div>
+        </form>
+    </div>
+</div>
+    <script src="menu.js"></script>
+</body>
+</html>
