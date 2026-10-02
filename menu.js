@@ -15,14 +15,39 @@ if (burger && nav) {
     });
 }
 
+const USERS_KEY = 'gitbank-users';
+const SESSION_KEY = 'gitbank-user';
+const firebaseConfig = {
+    apiKey: 'YOUR_API_KEY',
+    authDomain: 'YOUR_PROJECT.firebaseapp.com',
+    projectId: 'YOUR_PROJECT_ID',
+    storageBucket: 'YOUR_PROJECT.appspot.com',
+    messagingSenderId: 'YOUR_SENDER_ID',
+    appId: 'YOUR_APP_ID'
+};
+
+let firebaseAuth = null;
+let isFirebaseConfigured = false;
+
+if (window.firebase) {
+    const hasRealConfig = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('YOUR_');
+    if (hasRealConfig) {
+        try {
+            const app = firebase.initializeApp(firebaseConfig);
+            firebaseAuth = firebase.auth();
+            isFirebaseConfigured = true;
+        } catch (error) {
+            console.warn('Firebase init failed:', error);
+        }
+    }
+}
+
 const btnLoginPopup = document.getElementById('btn-login-popup');
 const btnRegisterPopup = document.getElementById('btn-register-popup');
 const loginModal = document.getElementById('login-modal');
 const registerModal = document.getElementById('register-modal');
 const closeLogin = document.getElementById('close-login');
 const closeRegister = document.getElementById('close-register');
-const USERS_KEY = 'gitbank-users';
-const SESSION_KEY = 'gitbank-user';
 
 function getUsers() {
     try {
@@ -74,6 +99,67 @@ function findUserByEmail(email) {
     return getUsers().find(user => user.email.toLowerCase() === email.toLowerCase());
 }
 
+async function handleSocialAuth(providerName, mode) {
+    const email = `${providerName.toLowerCase()}@gmail.com`;
+    const baseUser = { email, provider: providerName, name: providerName };
+
+    if (isFirebaseConfigured && firebaseAuth) {
+        try {
+            let provider;
+            if (providerName === 'Google') {
+                provider = new firebase.auth.GoogleAuthProvider();
+            } else if (providerName === 'Facebook') {
+                provider = new firebase.auth.FacebookAuthProvider();
+            }
+
+            if (!provider) {
+                throw new Error('Provider inconnu');
+            }
+
+            const result = await firebaseAuth.signInWithPopup(provider);
+            const user = result.user;
+            const userData = {
+                name: user.displayName || providerName,
+                email: user.email || email,
+                provider: providerName,
+                password: ''
+            };
+            setUserSession(userData);
+            if (mode === 'login') closeModal(loginModal);
+            if (mode === 'register') closeModal(registerModal);
+            return;
+        } catch (error) {
+            console.warn('Firebase social login failed:', error);
+        }
+    }
+
+    const existingUser = findUserByEmail(email);
+    if (existingUser) {
+        setUserSession(existingUser);
+    } else {
+        const users = getUsers();
+        users.push({
+            name: providerName,
+            email,
+            password: '',
+            provider: providerName,
+            birthdate: null
+        });
+        saveUsers(users);
+        setUserSession(baseUser);
+    }
+
+    if (mode === 'login') closeModal(loginModal);
+    if (mode === 'register') closeModal(registerModal);
+}
+
+function showFormError(formId, message) {
+    const errorDiv = document.getElementById(formId);
+    if (errorDiv) {
+        errorDiv.textContent = message;
+    }
+}
+
 if (btnLoginPopup && loginModal) {
     btnLoginPopup.addEventListener('click', () => {
         const sessionUser = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
@@ -112,34 +198,6 @@ window.addEventListener('click', (e) => {
 const loginForm = document.getElementById('form-login');
 const registerForm = document.getElementById('form-register');
 
-function handleSocialAuth(provider, mode) {
-    const email = `${provider.toLowerCase()}@gmail.com`;
-    const session = { email, provider, name: provider };
-    const existingUser = findUserByEmail(email);
-
-    if (existingUser) {
-        setUserSession(existingUser);
-    } else {
-        const users = getUsers();
-        users.push({
-            name: provider,
-            email,
-            password: '',
-            provider,
-            birthdate: null
-        });
-        saveUsers(users);
-        setUserSession({
-            name: provider,
-            email,
-            provider
-        });
-    }
-
-    if (mode === 'login') closeModal(loginModal);
-    if (mode === 'register') closeModal(registerModal);
-}
-
 const socialButtons = document.querySelectorAll('.social-btn');
 socialButtons.forEach(button => {
     button.addEventListener('click', () => {
@@ -150,7 +208,7 @@ socialButtons.forEach(button => {
 });
 
 if (registerForm) {
-    registerForm.addEventListener('submit', function(e) {
+    registerForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const fullname = document.getElementById('fullname').value.trim();
@@ -162,29 +220,46 @@ if (registerForm) {
         const errorDiv = document.getElementById('register-error');
 
         if (!fullname || !email || !password || !birthdate || !idFront || !idBack) {
-            errorDiv.textContent = 'Tous les champs sont obligatoires.';
+            showFormError('register-error', 'Tous les champs sont obligatoires.');
             return;
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            errorDiv.textContent = 'Email invalide.';
+            showFormError('register-error', 'Email invalide.');
             return;
         }
 
         if (!/^.*(?=.{8,})(?=.*\d)(?=.*[a-zA-Z]).*$/.test(password)) {
-            errorDiv.textContent = 'Mot de passe trop faible (8 caractères, 1 lettre, 1 chiffre).';
+            showFormError('register-error', 'Mot de passe trop faible (8 caractères, 1 lettre, 1 chiffre).');
             return;
         }
 
         const age = getAge(birthdate);
         if (age < 18) {
-            errorDiv.textContent = 'Vous devez avoir au moins 18 ans pour vous inscrire.';
+            showFormError('register-error', 'Vous devez avoir au moins 18 ans pour vous inscrire.');
             return;
+        }
+
+        if (isFirebaseConfigured && firebaseAuth) {
+            try {
+                const result = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+                await result.user.updateProfile({ displayName: fullname });
+                setUserSession({
+                    name: fullname,
+                    email,
+                    provider: 'Email'
+                });
+                showFormError('register-error', 'Inscription réussie !');
+                closeModal(registerModal);
+                return;
+            } catch (error) {
+                console.warn('Firebase email signup failed:', error);
+            }
         }
 
         const users = getUsers();
         if (users.some(user => user.email.toLowerCase() === email.toLowerCase())) {
-            errorDiv.textContent = 'Un compte avec cet email existe déjà.';
+            showFormError('register-error', 'Un compte avec cet email existe déjà.');
             return;
         }
 
@@ -199,13 +274,13 @@ if (registerForm) {
         users.push(newUser);
         saveUsers(users);
         setUserSession(newUser);
-        errorDiv.textContent = 'Inscription réussie !';
+        showFormError('register-error', 'Inscription réussie !');
         closeModal(registerModal);
     });
 }
 
 if (loginForm) {
-    loginForm.addEventListener('submit', function(e) {
+    loginForm.addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const email = this.querySelector('input[type="email"]').value.trim();
@@ -220,30 +295,47 @@ if (loginForm) {
         }
 
         if (!email || !password) {
-            errorDiv.textContent = 'Veuillez remplir tous les champs.';
+            showFormError('login-error', 'Veuillez remplir tous les champs.');
             return;
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            errorDiv.textContent = 'Email invalide.';
+            showFormError('login-error', 'Email invalide.');
             return;
+        }
+
+        if (isFirebaseConfigured && firebaseAuth) {
+            try {
+                const result = await firebaseAuth.signInWithEmailAndPassword(email, password);
+                const user = result.user;
+                setUserSession({
+                    name: user.displayName || 'Utilisateur',
+                    email: user.email,
+                    provider: 'Email'
+                });
+                showFormError('login-error', 'Connexion réussie !');
+                closeModal(loginModal);
+                return;
+            } catch (error) {
+                console.warn('Firebase email login failed:', error);
+            }
         }
 
         const users = getUsers();
         const user = users.find(item => item.email.toLowerCase() === email.toLowerCase());
 
         if (!user) {
-            errorDiv.textContent = 'Aucun compte trouvé pour cet email.';
+            showFormError('login-error', 'Aucun compte trouvé pour cet email.');
             return;
         }
 
         if (user.password && user.password !== password) {
-            errorDiv.textContent = 'Mot de passe incorrect.';
+            showFormError('login-error', 'Mot de passe incorrect.');
             return;
         }
 
         setUserSession(user);
-        errorDiv.textContent = 'Connexion réussie !';
+        showFormError('login-error', 'Connexion réussie !');
         closeModal(loginModal);
     });
 }
