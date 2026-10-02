@@ -227,3 +227,134 @@ footer {
     color: #00eaff;
     cursor: pointer;
 }
+
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-content label {
+    color: #eaf4ff;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.modal-content input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    background: rgba(15, 23, 42, 0.9);
+    color: #fff;
+    font-size: 1rem;
+}
+
+.modal-content input::placeholder {
+    color: #9aa5b1;
+}
+
+.modal-content button[type="submit"] {
+    margin-top: 8px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #00eaff, #5eead4);
+    color: #081018;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 20px rgba(0, 234, 255, 0.25);
+}
+
+.modal-content button[type="submit"]:hover {
+    transform: translateY(-1px);
+}
+
+.social-login {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.social-btn:hover {
+    transform: translateY(-1px);
+}
+
+.google-btn {
+    background: #ffffff;
+    color: #1f2937;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.facebook-btn {
+    background: #1877f2;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.social-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+.google-icon {
+    background: conic-gradient(#4285f4 0 25%, #34a853 25% 50%, #fbbc05 50% 75%, #ea4335 75% 100%);
+    color: #fff;
+    font-size: 0.75rem;
+}
+
+.facebook-icon {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+    color: #9aa5b1;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    margin: 4px 0 2px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.divider span {
+    padding: 0 12px;
+}
+
+#login-error,
+#register-error {
+    min-height: 20px;
+    margin-top: 4px;
+    color: #ff8a80;
+    font-size: 0.92rem;
+}

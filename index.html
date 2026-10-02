@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+     
 </head>
 <body>
     <header>
@@ -18,7 +19,8 @@
             <a href="#about">À propos</a>
         </nav>
         <div class="header-actions">
-            <button id="btn-login-popup">Connexion</button>
+            <button id="btn-login-popup">Connexion   </button>  
+            
             <button id="btn-register-popup">Inscription</button>
         </div>
         <div class="burger" id="burger">
@@ -69,6 +71,19 @@
         <span class="close" id="close-login">&times;</span>
         <h2>Connexion</h2>
         <form id="form-login">
+            <div class="social-login">
+                <button type="button" class="social-btn google-btn">
+                    <span class="social-icon google-icon">G</span>
+                    Continuer avec Google
+                </button>
+                <button type="button" class="social-btn facebook-btn">
+                    <span class="social-icon facebook-icon">f</span>
+                    Continuer avec Facebook
+                </button>
+            </div>
+
+            <div class="divider"><span>ou</span></div>
+
             <label for="login-email">Email :</label>
             <input type="email" id="login-email" placeholder="Email" required>
             <label for="login-password">Mot de passe :</label>
@@ -85,6 +100,19 @@
         <span class="close" id="close-register">&times;</span>
         <h2>Inscription</h2>
         <form id="form-register">
+            <div class="social-login">
+                <button type="button" class="social-btn google-btn">
+                    <span class="social-icon google-icon">G</span>
+                    S'inscrire avec Google
+                </button>
+                <button type="button" class="social-btn facebook-btn">
+                    <span class="social-icon facebook-icon">f</span>
+                    S'inscrire avec Facebook
+                </button>
+            </div>
+
+            <div class="divider"><span>ou</span></div>
+
             <label for="fullname">Nom complet :</label>
             <input type="text" id="fullname" placeholder="Nom complet" required>
             <label for="register-email">Email :</label>
